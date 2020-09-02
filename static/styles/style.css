@@ -9,6 +9,10 @@ body {
   margin: auto;
 }
 
+.monospace {
+  font-family: "Lucida Console", Courier, monospace;
+}
+
 input[type=text], select, textarea {
   background-color: transparent;
   background-color: rgba(220,220,220,0.5);

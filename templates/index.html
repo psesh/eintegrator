@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <html>
   <head>
     <link rel="stylesheet" href= "{{ url_for('static',filename='styles/style.css') }}" type="text/css" />
@@ -6,11 +8,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function(){
-            
+
             document.getElementById("radio".concat("{{ form['N'] }}")).checked = true;
+
             document.getElementById("distrn").value = "{{ form['distrn'] }}";
             distrn = $("#distrn").val();
             console.log(distrn)
+
+            document.getElementById("dimension_params").value = "{{ form['dimension_params'] }}";
+            dimension_params = $("#dimension_params").val();
+            console.log(dimension_params)
 
             switch (distrn) {
                 case "uniform":
@@ -26,6 +33,21 @@
                     $("#gaussian_params").hide();
                     break;
             }
+
+            switch (dimension_params){
+              case "1D":
+                  $("#univariate").show();
+                  $("#bivariate").hide();
+                  break;
+              case "2D":
+                  $("#univariate").hide();
+                  $("#bivariate").show();
+                  break;
+              default:
+                  $("#univariate").hide();
+                  $("#bivariate").hide();
+                  break;
+            }
             document.getElementById("lower").value = "{{ form['lower'] }}";
             document.getElementById("upper").value = "{{ form['upper'] }}";
             document.getElementById("mean").value = "{{ form['mean'] }}";
@@ -35,7 +57,6 @@
                 // console.log($("#distrn").val());
                 distrn = $("#distrn").val();
                 console.log(distrn)
-
                 switch (distrn) {
                     case "uniform":
                         $("#uniform_params").show();
@@ -52,6 +73,25 @@
                 }
             });
 
+            $("#dimension_params").change(function(){
+                dimension_params = $("#dimension_params").val();
+                console.log(dimension_params)
+                switch (dimension_params) {
+                    case "1D":
+                        $("#univariate").show();
+                        $("#bivariate").hide();
+                        break;
+                    case "2D":
+                        $("#univariate").hide();
+                        $("#bivariate").show();
+                        break;
+                    default:
+                        $("#univariate").show();
+                        $("#bivariate").hide();
+                        break;
+                }
+            });
+
             $("#detailed").change(function(){
                 if ($('#detailed').is(":checked")) {
                     $('#fig').attr('src', '/plot_d.png');
@@ -60,14 +100,14 @@
                     $('#fig').attr('src', '/plot.png');
                 }
             });
-            
+
 
         });
 
 
 
         </script>
-    <title>E Integrator</title>
+    <title>Eintegrator</title>
   </head>
 
   <body>
@@ -77,15 +117,15 @@
                 <form action='/integrate' method='post'>
                     <!--<label for="N">Number of quadrature points (Max 20):</label><br>
                     <input type="text" id="N" name="N" value={{ form['N'] }}><br>-->
-                    
+
                     <label for="N">Number of quadrature points:</label><br>
                     <div class='radio-toolbar'>
                         <input type="radio" id="radio1" name="N" value="1">
                         <label for="radio1">1</label>
-                      
+
                         <input type="radio" id="radio2" name="N" value="2">
                         <label for="radio2">2</label>
-                      
+
                         <input type="radio" id="radio3" name="N" value="3">
                         <label for="radio3">3</label>
 
@@ -98,26 +138,26 @@
 
                          <input type="radio" id="radio6" name="N" value="6" >
                          <label for="radio6">6</label>
-                       
+
                          <input type="radio" id="radio7" name="N" value="7">
                          <label for="radio7">7</label>
-                       
+
                          <input type="radio" id="radio8" name="N" value="8">
                          <label for="radio8">8</label>
- 
+
                          <input type="radio" id="radio9" name="N" value="9">
                          <label for="radio9">9</label>
- 
+
                          <input type="radio" id="radio10" name="N" value="10">
                          <label for="radio10">10</label>
                           <br>
-                        
+
                           <input type="radio" id="radio11" name="N" value="11" >
                         <label for="radio11">11</label>
-                      
+
                         <input type="radio" id="radio12" name="N" value="12">
                         <label for="radio12">12</label>
-                      
+
                         <input type="radio" id="radio13" name="N" value="13">
                         <label for="radio13">13</label>
 
@@ -130,10 +170,10 @@
 
                          <input type="radio" id="radio16" name="N" value="16" >
                         <label for="radio16">16</label>
-                      
+
                         <input type="radio" id="radio17" name="N" value="17">
                         <label for="radio17">17</label>
-                      
+
                         <input type="radio" id="radio18" name="N" value="18">
                         <label for="radio18">18</label>
 
@@ -145,8 +185,7 @@
                          <br>
                     </div>
 
-                    <label for="distrn">Distribution:</label><br>
-
+                    <label for="distrn">Distribution <span class="math display">\[\rho \left (x \right)\]</span></label>
                     <div class="custom-select">
                     <select id="distrn" name="distrn">
                         <option value="def">Choose...</option>
@@ -155,7 +194,7 @@
                     </select>
 
                     </div><br>
-                    
+
                     <div id="uniform_params" >
                         <label for="lower">Lower:</label><br>
                         <input id="lower" type="text" name="lower"><br>
@@ -170,7 +209,19 @@
                         <input id="variance" type="text" name="variance" ><br>
                     </div>
 
-                    <label for="expression">NumPy expression in terms of x:</label><br>
+                    <label for="dimension_params">Dimensions:</label><br>
+                    <div class="custom-select">
+                    <select id="dimension_params" name="dimension_params">
+                        <option value="univariate">1D</option>
+                        <option value="bivariate">2D</option>
+                    </select>
+
+                    </div><br>
+
+                    <label for="expression">NumPy expression in terms of x, examples include:<br>
+                    <span style="background-color: #fff0f0;font-family:monospace">sin(x) + x**3</span>,
+                    <span style="background-color: #fff0f0;font-family:monospace">x1 * x2 - exp(x2)</span>.
+                    </label><br>
                     <input id="expression" type="text" name="expression"><br>
 
                     <button type='button' onclick="window.location.href='{{ url_for('clear') }}';">Clear</button>
@@ -181,7 +232,7 @@
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
                         {% for message in messages %}
-                            
+
                             {{ message }}
 
                         {% endfor %}
@@ -194,6 +245,6 @@
                 <label for="detailed"> Show PDF and polynomial</label>
             </div>
         </div>
-    </div>  
+    </div>
   </body>
 </html>
